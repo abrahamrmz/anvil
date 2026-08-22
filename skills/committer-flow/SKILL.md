@@ -15,14 +15,14 @@ Flujo de dos fases: Fase 1 genera el commit y captura la rama destino; Fase 2 ej
 - **Modificar código, tests, configs o specs** — operación solo-lectura sobre el repo.
 - **Reintentar automáticamente un commit o push fallido** — reportar al humano y detener.
 - **Inferir rama destino sin preguntar** — siempre es decisión del usuario (ver Paso 1.4).
-- **Escribir contenido de git en un idioma distinto del inglés** — mensajes de commit y, si el flujo abre un PR, su título y cuerpo van completamente en inglés (ver "Idioma del contenido de git").
+- **Ignorar la convención de idioma del repo** — mensajes de commit y, si el flujo abre un PR, su título y cuerpo van en el idioma de la convención del repo, sin mezclar idiomas (ver "Idioma del contenido de git").
 
 ## Idioma del contenido de git
 
 Regla transversal a ambas fases:
 
-- Todo contenido que queda escrito en git o en el remoto se redacta **en inglés, siempre**: mensaje de commit (asunto, cuerpo, footer) y título + cuerpo del PR cuando se abre uno (`gh pr create`).
-- Aplica sin excepción, independientemente del idioma del historial previo del repo y del idioma de la conversación.
+- Todo contenido que queda escrito en git o en el remoto — mensaje de commit (asunto, cuerpo, footer) y título + cuerpo del PR cuando se abre uno (`gh pr create`) — se redacta en el idioma de la convención del repo: (1) lo que indique el `CLAUDE.md` del proyecto; (2) si no, el idioma dominante de `git log --oneline -15`. En estos proyectos el default es **español**.
+- Nunca mezclar idiomas dentro de un mismo mensaje o PR.
 - Identificadores de código, paths, nombres de archivos, flags, comandos y nombres propios se citan verbatim, sin traducir.
 - La interacción con el humano (preguntas, reportes, notas de handoff) sigue en español — esta regla solo cubre contenido de git.
 
@@ -114,7 +114,7 @@ Si el diff mezcla tipos, elegir el principal. Si es genuinamente mixto, usar `ch
 
 Formato: `<type>(<scope>): <description>`
 
-Idioma: el mensaje completo (asunto, cuerpo y footer) se escribe **en inglés, siempre**, sin importar el idioma del historial del repo ni el de la conversación. Identificadores de código, paths y flags van verbatim.
+Idioma: el mensaje completo (asunto, cuerpo y footer) sigue la convención del repo (`CLAUDE.md` del proyecto o idioma dominante del historial; default español en estos proyectos). Identificadores de código, paths y flags van verbatim.
 
 Reglas: tipo en minúsculas · scope opcional (área afectada) · descripción en imperativo, minúscula, sin punto · asunto ≤ 50 caracteres.
 
@@ -140,7 +140,7 @@ EOF
 - [ ] Hay cambios staged
 - [ ] Tipo corresponde al propósito principal
 - [ ] Asunto ≤ 50 caracteres, imperativo, sin punto
-- [ ] Mensaje completo en inglés (identificadores de código verbatim)
+- [ ] Idioma conforme a la convención del repo (identificadores de código verbatim)
 - [ ] Cuerpo separado del asunto por línea en blanco (si aplica)
 - [ ] Sin anti-patrones
 - [ ] Footer con ticket si se detectó en la rama
@@ -242,7 +242,7 @@ Para cualquier fallo: capturar output textual completo → DETENER → reportar 
 ### Fase 1
 - [ ] `verify-handoff.sh` devolvió exit 0 (o se omitió por fallback documentado)
 - [ ] Commit hash capturado y válido
-- [ ] Mensaje del commit redactado íntegramente en inglés
+- [ ] Mensaje del commit en el idioma de la convención del repo
 - [ ] Commit hash registrado en `committer-handoff.md`
 - [ ] Rama destino registrada (no vacía)
 - [ ] Handoff propio existe en `.project-context/runs/<run_id>/committer-handoff.md`

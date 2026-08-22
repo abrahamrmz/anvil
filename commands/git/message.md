@@ -26,7 +26,7 @@ Seguir estas reglas estrictamente:
 
 ### Idioma (regla dura)
 
-El mensaje generado va **siempre en inglés** — asunto, cuerpo y footer — aunque la descripción del usuario esté en español y aunque el historial del repo esté en otro idioma. Identificadores de código, paths, flags y nombres propios se citan verbatim, sin traducir. La explicación que acompaña al mensaje sigue en español.
+El mensaje generado sigue la convención del repo — lo que indique su `CLAUDE.md` o, si no, el idioma dominante de `git log --oneline -15` (default español en estos proyectos). Nunca mezclar idiomas en un mismo mensaje. Identificadores de código, paths, flags y nombres propios se citan verbatim, sin traducir. La explicación que acompaña al mensaje sigue en español.
 
 ### Formato de línea de asunto: `<type>(<scope>): <description>`
 

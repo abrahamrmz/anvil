@@ -49,12 +49,8 @@ Cargar **solo** los archivos relevantes para la tarea actual:
 | Trabajando en... | Cargar |
 |---|---|
 | asyncio, TaskGroup, concurrencia estructurada | `guides/async/patterns.md` |
-| Context managers asíncronos, timeouts, streaming | `guides/async/resources.md` |
 | Fixtures de pytest, parametrize, mocking | `guides/testing/pytest.md` |
-| Testing asíncrono, factory fixtures | `guides/testing/async-testing.md` |
 | Embeddings, procesamiento en batch, operaciones vectoriales | `guides/ml/embeddings.md` |
-| Arrays memory-mapped, datasets grandes, memoria GPU | `guides/ml/memory.md` |
-| Context managers, connection pools, cleanup | `guides/cleanup/resources.md` |
 | Validación de input, SQL injection, secrets | `guides/security.md` |
 
 ### Detección y Checklists
@@ -64,16 +60,6 @@ Cargar **solo** los archivos relevantes para la tarea actual:
 | Revisión de código | `detection/anti-patterns.md` |
 | Antes de escribir código Python | `checklists/pre.md` |
 | Después de escribir código Python | `checklists/post.md` |
-
-### Ejemplos (patrones buenos y malos por dominio, ~2-3KB cada uno)
-
-| Trabajando en... | Cargar |
-|---|---|
-| Type hints, sintaxis moderna, Pydantic v2 | `examples/types.md` |
-| Manejo de errores, exception groups, logging | `examples/errors.md` |
-| Patrones de testing, fixtures, mocking | `examples/testing.md` |
-| NumPy/Pandas, vectorización, procesamiento en batch | `examples/data.md` |
-| Patrones async, TaskGroup, timeouts | `examples/async.md` |
 
 ## Gate Post-Implementación
 
