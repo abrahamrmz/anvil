@@ -1,5 +1,6 @@
-# Anvil - Deployment Manifest
-# Deploys agents, skills, and commands to multiple AI coding tools.
+# Anvil - Deployment Manifest (adaptado para Abraham, 2026-08-21)
+# Selección basada en auditoría de ~/Desktop/repos: stack Python/Django/Celery,
+# scrapers Selenium, pipelines LLM (DeepInfra/OpenRouter/Anthropic), deploy VPS.
 #
 # sync_mode:
 #   - "symlink" (default): target/{component} -> repo. Edits go directly to repo.
@@ -8,71 +9,103 @@
 # Component tags:
 #   - "HEAD"    -> follows current branch
 #   - "v1.0.0"  -> pinned to git tag (copy)
-#   - "abc1234"  -> pinned to commit SHA (copy)
+#   - "abc1234" -> pinned to commit SHA (copy)
+#
+# NOTA: con tag HEAD los skills quedan como symlinks al repo — un `git pull` o
+# `anvil update` cambia las instrucciones vivas. Trabajar en una rama local
+# (ej. `adaptacion`) y traer cambios de upstream solo tras revisarlos.
 
-# Deploy targets - one per tool. Set enabled: false to skip.
+# Deploy targets — solo Claude Code (única herramienta en uso).
 targets:
   claude:
     enabled: true
     path: ~/.claude
   opencode:
-    enabled: true
+    enabled: false
     path: ~/.config/opencode
   gemini:
-    enabled: true
+    enabled: false
     path: ~/.gemini
   codex:
-    enabled: true
+    enabled: false
     path: ~/.codex
   cursor:
-    enabled: true
+    enabled: false
     path: ~/.cursor
 
-# Cursor deploys to .cursor/rules/ in specific project directories.
-# Add your projects to deploy agents as Cursor rules:
 cursor_projects: []
-  # - ~/projects/my-app
-  # - ~/projects/other-app
 
-# Components managed by anvil
-# Use include/exclude to select specific agents, skills, or commands.
-# include: only deploy these (whitelist). exclude: deploy all except these (blacklist).
-# include takes precedence over exclude. Names without .md extension.
+# include = whitelist (tiene precedencia sobre exclude). Nombres sin .md.
 components:
   agents:
     tag: "HEAD"
-    # include:              # Only deploy these agents
-    #   - developer
-    #   - tester
-    #   - dba
-    # exclude:              # Deploy all EXCEPT these
-    #   - mkt-content
-    #   - reporter
+    include:
+      - explorer        # investigación read-only con detección de prompt injection
+      - security        # SAST/secrets/auth — el gap más grande del portafolio
+      - qa              # revisión con gate de calidad
+      - tester          # tests (pytest) — para subir cobertura en repos legacy
+      - dba             # migraciones/esquema — útil para SQLite→PostgreSQL de pdl_mty
+      - tech-writer     # README/docs — para los repos sin documentación
+      # NOTA: el agente "reporter" del README no existe como archivo en agents/;
+      # su función la cubre la skill reporter (incluida abajo).
+      # Excluidos: developer-backend/frontend/mobile (Go/React/Flutter-céntricos),
+      # pm, architect, designers, devops, mkt-content, load-tester, observability,
+      # dba-broker/cache/nosql/reader, y demás. Agregar aquí si hacen falta.
+      # - developer-ai  # candidato: desarrollo de features LLM (prompting, evals)
+
   skills:
     tag: "HEAD"
-    # include:
-    #   - go-conventions
-    #   - react-conventions
+    include:
+      # --- núcleo Python ---
+      - python-conventions   # OJO: SKILL.md referencia 9 archivos inexistentes — podar
+      - lint                 # ruff; detecta Makefile/pyproject por proyecto
+      - run-tests            # pytest / manage.py test con coverage
+      # --- flujo de trabajo ---
+      - handoff              # continuidad entre sesiones (.handoff/)
+      - scan-project         # genera context.md de un repo
+      - context-nav          # formaliza el patrón .project-context/ ya en uso
+      - reporter             # reporte de cierre de sesión + deltas a .project-context/
+      # --- bases de datos ---
+      - db-engines           # postgresql/sqlite/redis — migración pdl_mty y Celery
+      - db-optimize
+      - db-schema-scan
+      # --- calidad y revisión ---
+      - post-review          # checklist de postgres aplica; ignorar go/react/terraform
+      - code-review-rubric
+      - dependency-check     # auditoría de paquetes (requirements congelados 2024)
+      - test-api             # validación de contratos — APIs django-ninja/DRF
+      # --- git ---
+      - git-commit           # PENDIENTE: ajustar a commits en español tipo(area):
+      - git-diff
+      - committer-flow
+      # --- IA ---
+      - ai-engineering       # prompting/evals/providers — pipelines DeepInfra/OpenRouter
+      # --- utilidades ---
+      - generate-diagram     # mermaid (C4, ERD, secuencia)
+      # Candidatos futuros (activar descomentando):
+      # - ai-architecture    # diseño de features IA con criterio de eval
+      # - service-map        # dependencias cross-repo (radarman <-> dashboard)
+      # - cross-service-dev  # cambios coordinados multi-repo
+      # - e2e-test-run       # Playwright/Cypress
+      # - perf               # carga con vegeta/k6/locust
+      # - infra-probe        # diagnóstico de VPS
+      # Excluidos por stack: go/react/flutter/rust/swift/astro/typescript-conventions,
+      # devops-conventions, mcp-dev/setup, design-*, drawio, social-content, export-system.
+      # Skills propias por crear: django-conventions, monitoreo-conventions, secrets-hygiene.
+
   commands:
     tag: "HEAD"
+    # Solo existen comandos de git + cross-service-dev; se despliegan todos.
 
-# Files synced individually
-files:
-  CLAUDE.md:
-    tag: "HEAD"
+# Sin CLAUDE.md global: no existe en la raíz del repo y así debe quedarse —
+# los CLAUDE.md por proyecto (pdl_mty, etc.) son la fuente de verdad.
+files: {}
 
-# Remote registries - browse and install additional agents/skills
-# Each registry points to a JSON index with available entries.
-# Use `anvil registry list` to browse, `anvil registry add <name>` to install.
 registries:
   - name: official
     path: .
-    # url: https://raw.githubusercontent.com/ernesto2108/anvil/main/registry.json
-#   - name: team
-#     url: https://raw.githubusercontent.com/myteam/anvil-agents/main/registry.json
 
 # Local-only paths - NEVER synced, NEVER touched
-# These stay in each tool's config and are not managed by anvil
 ignore:
   - settings.json
   - settings.local.json
