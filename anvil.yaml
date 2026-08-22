@@ -57,7 +57,9 @@ components:
     tag: "HEAD"
     include:
       # --- núcleo Python ---
-      - python-conventions   # OJO: SKILL.md referencia 9 archivos inexistentes — podar
+      - python-conventions   # (rutas muertas ya podadas en rama adaptacion)
+      - django-conventions   # propia: settings/.env, Celery, multi-tenancy, testing
+      - monitoreo-conventions # propia: config por cliente, fronteras externas, entrega
       - lint                 # ruff; detecta Makefile/pyproject por proyecto
       - run-tests            # pytest / manage.py test con coverage
       # --- flujo de trabajo ---

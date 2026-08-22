@@ -1,0 +1,23 @@
+{
+  "skill_name": "django-conventions",
+  "evals": [
+    { "id": 1, "type": "trigger", "prompt": "Agrega un endpoint a la app de estructuras en views.py y su ruta", "should_trigger": true },
+    { "id": 2, "type": "trigger", "prompt": "El worker de Celery tira 'database is locked', ayúdame a arreglarlo", "should_trigger": true },
+    { "id": 3, "type": "trigger", "prompt": "Convierte este notebook de xarray a un script", "should_trigger": false },
+    { "id": 4, "type": "trigger", "prompt": "Dame un one-liner de awk para contar líneas por extensión", "should_trigger": false },
+    { "id": 5, "type": "quality", "prompt": "Configura DEBUG y SECRET_KEY para el deploy de este proyecto Django", "assertions": [
+      "Lee DEBUG y SECRET_KEY desde .env (decouple/environ), nunca hardcodeados",
+      "SECRET_KEY sin valor default en el código",
+      "Menciona .env.example y que la librería de config esté en requirements"
+    ]},
+    { "id": 6, "type": "quality", "prompt": "Crea una data migration que registre las API keys del cliente Difusión", "assertions": [
+      "Rechaza poner la key en claro dentro de la migración",
+      "Propone leerla de env en runtime o poblarla con management command"
+    ]},
+    { "id": 7, "type": "quality", "prompt": "Agrega un modelo Mencion al sistema multi-tenant", "assertions": [
+      "El modelo incluye FK cliente con índice",
+      "El queryset se filtra vía manager/middleware, no en cada view",
+      "La clave de deduplicación incluye al cliente"
+    ]}
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "skill_name": "monitoreo-conventions",
+  "evals": [
+    { "id": 1, "type": "trigger", "prompt": "Vamos a dar de alta un cliente nuevo en el monitor de Google News", "should_trigger": true },
+    { "id": 2, "type": "trigger", "prompt": "El scraper de Facebook con Selenium se queda colgado, revísalo", "should_trigger": true },
+    { "id": 3, "type": "trigger", "prompt": "Ayúdame con el layout del reporte PPTX en python-pptx", "should_trigger": false },
+    { "id": 4, "type": "trigger", "prompt": "Explícame cómo funciona el GIL de Python", "should_trigger": false },
+    { "id": 5, "type": "quality", "prompt": "El LLM primario falló clasificando estas notas, ¿qué hacemos con los ítems?", "assertions": [
+      "Reintenta la cadena de fallback declarada en config",
+      "Si todo falla: marca pendiente_revision y notifica",
+      "Nunca publica una categoría default a clientes"
+    ]},
+    { "id": 6, "type": "quality", "prompt": "Agrega el envío del resumen diario al grupo de WhatsApp del cliente", "assertions": [
+      "El envío pasa por el router de entrega único",
+      "En ENTORNO != prod el destino es el grupo de pruebas",
+      "Existe --dry-run y el reenvío es idempotente"
+    ]},
+    { "id": 7, "type": "quality", "prompt": "Necesitamos este mismo monitor para otro cliente, ¿clonamos el repo?", "assertions": [
+      "Rechaza el fork por cliente",
+      "Propone config_<cliente>.py + prompts_<cliente>.py sobre el pipeline único",
+      "Secretos del cliente a .env o BD, no al config versionado"
+    ]}
+  ]
+}
