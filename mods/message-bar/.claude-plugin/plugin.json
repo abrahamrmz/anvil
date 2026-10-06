@@ -1,0 +1,6 @@
+{
+  "name": "message-bar",
+  "version": "0.1.0",
+  "description": "Dibuja una barra de color y aire alrededor de tus mensajes en el transcript para ubicarlos al hacer scroll",
+  "author": { "name": "Ernesto Diaz" }
+}
