@@ -3,13 +3,34 @@
 //
 // SIN VERIFICAR EN VIVO (requiere Claude Code v2.1.287+). Pendientes:
 //   - forma exacta de $.session.usage().cost (se lee de forma defensiva)
-//   - tokens de entrada/salida (no se muestran todavia)
 //   - que el Box con justifyContent/width sea aceptado en SessionMode
+//   - que result.usage de turn.step traiga los campos documentados (se leen
+//     de forma defensiva: si faltan, cuentan como 0)
 // Si un arbol no valida, Claude Code dibuja su propio SessionMode y deja una
 // linea en el transcript con el motivo (ver troubleshoot de mods).
+//
+// Tokens: se acumulan por sesion desde turn.step (cada request al modelo,
+// incluidos los de subagentes). "in" es input fresco + escritura de cache;
+// "cache" son las lecturas de cache, que son baratas y dominan el volumen.
+// Los contadores viven en variables del modulo: se reinician al recargar el
+// mod y en /clear, /resume y /branch (session.end).
 
 const BAR_WIDTH = 10
 const REFRESH_MS = 2000
+
+const tokens = { input: 0, cache: 0, output: 0 }
+
+function resetTokens() {
+  tokens.input = 0
+  tokens.cache = 0
+  tokens.output = 0
+}
+
+function addUsage(usage) {
+  tokens.input += (Number(usage.input_tokens) || 0) + (Number(usage.cache_creation_input_tokens) || 0)
+  tokens.cache += Number(usage.cache_read_input_tokens) || 0
+  tokens.output += Number(usage.output_tokens) || 0
+}
 const PARTIALS = ['', '▏', '▎', '▍', '▌', '▋', '▊', '▉']
 
 // 950 -> "950", 15500 -> "15.5k", 1000000 -> "1M"
@@ -60,6 +81,23 @@ export function register(on) {
     return next(e)
   })
 
+  // Acumula los tokens de cada request al modelo. Es un generador porque el
+  // evento hace streaming: yield* reenvia la respuesta y devuelve el resultado.
+  on('turn.step', async function* ($, e, next) {
+    const result = yield* next(e)
+    if (result?.usage) {
+      addUsage(result.usage)
+      $.ui.invalidate('ui.render')
+    }
+    return result
+  })
+
+  // /clear, /resume y /branch empiezan una conversacion nueva
+  on('session.end', async ($, e, next) => {
+    resetTokens()
+    return next(e)
+  })
+
   on('ui.render', { component: 'SessionMode' }, async ($, e, next) => {
     const { Box, Text } = $.ui.resolve(e)
     // El dibujo propio de Claude Code (auto mode on ...), que se conserva
@@ -79,6 +117,11 @@ export function register(on) {
         children: [' (' + fmtTokens(usage?.context?.tokens) + '/' + fmtTokens(usage?.context?.window) + ')'],
       }),
     ]
+    parts.push(
+      Text({
+        children: [' · in ' + fmtTokens(tokens.input) + ' · cache ' + fmtTokens(tokens.cache) + ' · out ' + fmtTokens(tokens.output)],
+      }),
+    )
     if (usd !== null) parts.push(Text({ children: [' · ~$' + usd.toFixed(3)] }))
 
     // Modo a la izquierda, uso a la derecha
