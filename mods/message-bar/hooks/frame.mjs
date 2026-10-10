@@ -2,7 +2,6 @@
 // elementos ya resueltos (Box, Text), para probarlas con `node --test` sin el
 // API de mods.
 
-export const BAR_COLOR = 'cyan'
 // Clave del tema: se adapta a tema claro u oscuro. Una terminal no tiene
 // opacidad real, asi que "un poco opaco" se logra con el fondo del tema.
 export const MESSAGE_BG = 'userMessageBackground'
@@ -24,50 +23,40 @@ export function shouldRedraw(props) {
   return props.text.split('\n').length <= MAX_LINES
 }
 
-// Envuelve el dibujo original con la barra y aire arriba/abajo. La barra es una
-// columna de 1 celda con fondo de color que se estira a la altura del mensaje.
-export function wrapEngine(Box, message, color = BAR_COLOR) {
+// Envuelve el dibujo original con aire arriba/abajo.
+export function wrapEngine(Box, message) {
   return Box({
-    flexDirection: 'row',
+    flexDirection: 'column',
     marginTop: 1,
     marginBottom: 1,
-    children: [
-      Box({ key: 'bar', width: 1, backgroundColor: color, children: [] }),
-      Box({ key: 'message', flexDirection: 'column', paddingLeft: 1, children: [message] }),
-    ],
+    children: [message],
   })
 }
 
-// Dibuja el mensaje propio: barra, linea tenue con nombre y hora, y el texto con
-// un fondo que cubre solo el ancho del texto (alignSelf evita que se estire).
+// Dibuja el mensaje propio: linea tenue con nombre y hora, y el texto con
+// un fondo que cubre todo el ancho de la terminal (el cuerpo no usa alignSelf,
+// asi que se estira).
 export function buildMessage(Box, Text, { name, time, text }, colors = {}) {
-  const bar = colors.bar ?? BAR_COLOR
   const bg = colors.bg ?? MESSAGE_BG
   const header = [name, time].filter(Boolean).join(' · ')
   const lines = text.split('\n').map((line, i) => (i === 0 ? '❯ ' : '  ') + (line || ' '))
 
   return Box({
-    flexDirection: 'row',
+    flexDirection: 'column',
     marginTop: 1,
     marginBottom: 1,
+    marginRight: 1,
     children: [
-      Box({ key: 'bar', width: 1, backgroundColor: bar, children: [] }),
+      Text({ key: 'header', dimColor: true, children: [header] }),
       Box({
-        key: 'message',
+        key: 'body',
         flexDirection: 'column',
-        paddingLeft: 1,
-        children: [
-          Text({ key: 'header', dimColor: true, children: [header] }),
-          Box({
-            key: 'body',
-            flexDirection: 'column',
-            alignSelf: 'flex-start',
-            backgroundColor: bg,
-            paddingLeft: 1,
-            paddingRight: 1,
-            children: lines.map((line, i) => Text({ key: 'line-' + i, children: [line] })),
-          }),
-        ],
+        backgroundColor: bg,
+        paddingLeft: 2,
+        paddingRight: 2,
+        paddingTop: 1,
+        paddingBottom: 1,
+        children: lines.map((line, i) => Text({ key: 'line-' + i, children: [line] })),
       }),
     ],
   })

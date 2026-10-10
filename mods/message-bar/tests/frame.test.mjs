@@ -1,7 +1,7 @@
 // Pruebas de la logica pura. Se corren con: node --test mods/message-bar/tests/frame.test.mjs
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { BAR_COLOR, MAX_LINES, MESSAGE_BG, buildMessage, formatTime, shouldRedraw, wrapEngine } from '../hooks/frame.mjs'
+import { MAX_LINES, MESSAGE_BG, buildMessage, formatTime, shouldRedraw, wrapEngine } from '../hooks/frame.mjs'
 
 // Elementos de mentira: devuelven sus props, para inspeccionar el arbol
 const Box = (props) => props
@@ -9,51 +9,48 @@ const Text = (props) => ({ _text: true, ...props })
 
 const textsOf = (node) => (node.children ?? []).flatMap((c) => (c._text ? [c.children[0]] : textsOf(c)))
 
-test('wrapEngine envuelve el mensaje con barra y aire arriba y abajo', () => {
+test('wrapEngine envuelve el mensaje con aire arriba y abajo', () => {
   const message = { type: 'engine' }
   const tree = wrapEngine(Box, message)
-  assert.equal(tree.flexDirection, 'row')
   assert.equal(tree.marginTop, 1)
   assert.equal(tree.marginBottom, 1)
-  const [bar, body] = tree.children
-  assert.equal(bar.width, 1)
-  assert.equal(bar.backgroundColor, BAR_COLOR)
-  assert.equal(body.children[0], message)
+  assert.equal(tree.children[0], message)
 })
 
-test('buildMessage: barra, encabezado con nombre y hora, y texto con fondo corto', () => {
+test('buildMessage: encabezado con nombre y hora, y texto con fondo a todo el ancho', () => {
   const tree = buildMessage(Box, Text, { name: 'ernesto', time: '11:26', text: 'hola' })
-  const [bar, content] = tree.children
-  assert.equal(bar.backgroundColor, BAR_COLOR)
-  const [header, body] = content.children
+  const [header, body] = tree.children
   assert.equal(header.dimColor, true)
   assert.deepEqual(header.children, ['ernesto · 11:26'])
-  // El fondo va en el cuerpo, que no se estira al ancho de la fila
+  // El cuerpo se estira: el fondo ocupa todo el ancho
   assert.equal(body.backgroundColor, MESSAGE_BG)
-  assert.equal(body.alignSelf, 'flex-start')
+  assert.equal(body.alignSelf, undefined)
+  // Margen interno a los costados y arriba/abajo
+  assert.deepEqual([body.paddingLeft, body.paddingRight, body.paddingTop, body.paddingBottom], [2, 2, 1, 1])
+  assert.equal(tree.marginRight, 1)
+  // Sin linea en blanco entre el encabezado y el fondo
+  assert.equal(body.marginTop, undefined)
   assert.deepEqual(textsOf(body), ['❯ hola'])
 })
 
 test('buildMessage: varias lineas, sangria y linea vacia', () => {
   const tree = buildMessage(Box, Text, { name: 'x', time: '09:05', text: 'uno\n\ndos' })
-  const body = tree.children[1].children[1]
-  assert.deepEqual(textsOf(body), ['❯ uno', '   ', '  dos'])
+  assert.deepEqual(textsOf(tree.children[1]), ['❯ uno', '   ', '  dos'])
 })
 
 test('buildMessage: sin nombre solo muestra la hora', () => {
   const tree = buildMessage(Box, Text, { name: '', time: '11:26', text: 'hola' })
-  assert.deepEqual(tree.children[1].children[0].children, ['11:26'])
+  assert.deepEqual(tree.children[0].children, ['11:26'])
 })
 
-test('buildMessage: los colores se pueden cambiar', () => {
-  const tree = buildMessage(Box, Text, { name: 'x', time: '1', text: 'a' }, { bar: 'magenta', bg: 'gray' })
-  assert.equal(tree.children[0].backgroundColor, 'magenta')
-  assert.equal(tree.children[1].children[1].backgroundColor, 'gray')
+test('buildMessage: el color de fondo se puede cambiar', () => {
+  const tree = buildMessage(Box, Text, { name: 'x', time: '1', text: 'a' }, { bg: 'gray' })
+  assert.equal(tree.children[1].backgroundColor, 'gray')
 })
 
 test('buildMessage: las claves de los hijos son distintas', () => {
   const tree = buildMessage(Box, Text, { name: 'x', time: '1', text: 'a\nb' })
-  const keys = [tree.children[0].key, tree.children[1].key, ...tree.children[1].children.map((c) => c.key)]
+  const keys = [...tree.children.map((c) => c.key), ...tree.children[1].children.map((c) => c.key)]
   assert.equal(new Set(keys).size, keys.length)
 })
 
