@@ -4,7 +4,7 @@
 #
 # sync_mode:
 #   - "symlink" (default): target/{component} -> repo. Edits go directly to repo.
-#   - "copy": copies files. Used for agents (tier resolution) and pinned components.
+#   - "copy": copies files. Used for agents (permission resolution) and pinned components.
 #
 # Component tags:
 #   - "HEAD"    -> follows current branch
@@ -77,7 +77,7 @@ components:
       - dependency-check     # auditoría de paquetes (requirements congelados 2024)
       - test-api             # validación de contratos — APIs django-ninja/DRF
       # --- git ---
-      - git-commit           # PENDIENTE: ajustar a commits en español tipo(area):
+      - git-commit           # upstream ya exige mensaje en español (749909e), sin override por repo
       - git-diff
       - committer-flow
       # --- IA ---
