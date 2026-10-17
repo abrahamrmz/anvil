@@ -69,7 +69,7 @@ Si el diff mezcla tipos → elegir el principal por volumen e intención. Si es 
 
 Formato: `<type>(<scope>): <description>`
 
-**Idioma — regla dura:** el mensaje completo (asunto, cuerpo y footer) sigue la convención del repo, determinada en este orden: (1) lo que indique el `CLAUDE.md` del proyecto; (2) si no dice nada, el idioma dominante de `git log --oneline -15`. En estos proyectos el default es **español**. Nunca mezclar idiomas dentro de un mismo mensaje. Identificadores de código, paths, nombres de archivos, flags, comandos y nombres propios se citan verbatim, sin traducir.
+**Idioma — regla dura:** el mensaje completo (asunto, cuerpo y footer) se escribe **en español, siempre**. Aplica sin excepción, independientemente del idioma del historial previo del repo y del idioma de la conversación con el humano. Excepciones que se citan verbatim, sin traducir: los tipos de Conventional Commits (`feat`, `fix`, `chore`, `refactor`, etc. — son identificadores del estándar), identificadores de código, paths, nombres de archivos, flags, comandos y nombres propios.
 
 **Reglas del asunto:**
 - Tipo en minúsculas.
@@ -88,15 +88,15 @@ Formato: `<type>(<scope>): <description>`
 - `BREAKING CHANGE: <descripción>` si aplica.
 
 **Anti-patrones — NUNCA:**
-- "fix bug", "update code", "changes", "WIP", "misc", "stuff".
-- Tiempo pasado: "added", "fixed", "updated" → usar imperativo: "add", "fix", "update".
+- "arregla bug", "actualiza código", "cambios", "WIP", "varios", "cosas".
+- Tiempo pasado: "agregado", "corregido", "actualizado" → usar imperativo: "agrega", "corrige", "actualiza".
 - Punto final en el asunto.
-- Mezclar idiomas en un mismo mensaje o ignorar la convención de idioma del repo.
+- Escribir el mensaje (o parte de él) en un idioma distinto del español.
 
 **Checklist pre-commit:**
 - [ ] Tipo corresponde al propósito principal del diff
 - [ ] Asunto ≤ 50 caracteres, imperativo, sin punto
-- [ ] Idioma conforme a la convención del repo (identificadores de código verbatim)
+- [ ] Mensaje completo en español (tipos de Conventional Commits e identificadores de código verbatim)
 - [ ] Cuerpo separado del asunto por línea en blanco (si aplica)
 - [ ] Sin anti-patrones
 - [ ] Footer con ticket si se detectó en la rama
